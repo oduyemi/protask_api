@@ -78,7 +78,7 @@ router.post("/task-assignment", (req, res) => __awaiter(void 0, void 0, void 0, 
     }
 }));
 //   M   E   N   T   E   E   S
-router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/mentees", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { fname, lname, email, phone, password, confirmPassword } = req.body;
         if (![fname, lname, email, phone, password, confirmPassword].every((field) => field)) {
@@ -119,7 +119,7 @@ router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, functio
         return res.status(500).json({ message: "Error registering mentee" });
     }
 }));
-router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/mentees/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
         if (![email, password].every((field) => field)) {
@@ -271,7 +271,7 @@ router.post("/mentees/file-attachment", (req, res) => __awaiter(void 0, void 0, 
         return res.status(500).json({ message: "Error uploading file attachment for mentees" });
     }
 }));
-router.post("/logout", (req, res) => {
+router.post("/mentees/logout", (req, res) => {
     try {
         // Pop mentee session
         req.session.destroy((err) => {
@@ -288,7 +288,7 @@ router.post("/logout", (req, res) => {
     }
 });
 //   M   E   N   T   O   R   S
-router.post("/mentors/register", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/mentors", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { fname, lname, email, phone, password, confirmPassword } = req.body;
         if (![fname, lname, email, phone, password, confirmPassword].every((field) => field)) {
@@ -304,6 +304,9 @@ router.post("/mentors/register", (req, res) => __awaiter(void 0, void 0, void 0,
         const hashedPassword = yield (0, bcrypt_1.hash)(password, 10);
         const newMentor = new mentorModel_js_1.default({ fname, lname, email, phone, password: hashedPassword });
         yield newMentor.save();
+        if (!newMentor) {
+            return res.status(500).json({ message: "Error registering Mentor" });
+        }
         // Generate and send PIN
         const pin = Math.floor(1000 + Math.random() * 9000).toString();
         const phoneNumber = phone;

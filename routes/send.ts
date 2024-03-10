@@ -111,7 +111,7 @@ router.post("/task-assignment", async (req: Request, res: Response) => {
 
     //   M   E   N   T   E   E   S
 
-router.post("/register", async (req: Request, res: Response) => {
+router.post("/mentees", async (req: Request, res: Response) => {
     try {
         const { fname, lname, email, phone, password, confirmPassword } = req.body;
         if (![fname, lname, email, phone, password, confirmPassword].every((field) => field)) {
@@ -128,7 +128,7 @@ router.post("/register", async (req: Request, res: Response) => {
         }
 
         const hashedPassword = await hash(password, 10);
-        const newMentee = new Mentee({ fname, lname, email, phone, password: hashedPassword });
+        const newMentee: IMentee = new Mentee({ fname, lname, email, phone, password: hashedPassword }) as IMentee;
         await newMentee.save();
 
         // Access token
@@ -163,7 +163,7 @@ router.post("/register", async (req: Request, res: Response) => {
 
    
   
-router.post("/login", async (req: Request, res: Response) => {
+router.post("/mentees/login", async (req: Request, res: Response) => {
 try {
     const { email, password } = req.body;
     if (![email, password].every((field) => field)) {
@@ -171,7 +171,7 @@ try {
     }
 
     try {
-    const mentee = await Mentee.findOne({ email });
+    const mentee: IMentee | null = await Mentee.findOne({ email });
     if (!mentee) {
         return res
         .status(401)
@@ -339,10 +339,8 @@ router.post("/mentees/file-attachment", async (req: Request, res: Response) => {
     }
 });
 
-
-
     
-router.post("/logout", (req, res) => {
+router.post("/mentees/logout", (req, res) => {
     try {
         // Pop mentee session
         req.session.destroy((err) => {
@@ -362,35 +360,40 @@ router.post("/logout", (req, res) => {
 
     //   M   E   N   T   O   R   S
 
-router.post("/mentors/register", async (req: Request, res: Response) => {
+router.post("/mentors", async (req: Request, res: Response) => {
     try {
         const { fname, lname, email, phone, password, confirmPassword } = req.body;
         if (![fname, lname, email, phone, password, confirmPassword].every((field) => field)) {
             return res.status(400).json({ message: "All fields are required" });
         }
-
+    
         if (password !== confirmPassword) {
             return res.status(400).json({ message: "Both passwords must match!" });
         }
-
+    
         const existingMentor = await Mentor.findOne({ email });
         if (existingMentor) {
             return res.status(400).json({ message: "Email already registered" });
         }
-
+    
         const hashedPassword = await hash(password, 10);
-        const newMentor = new Mentor({ fname, lname, email, phone, password: hashedPassword });
-        await newMentor.save();
+        const newMentor: IMentor = new Mentor({ fname, lname, email, phone, password: hashedPassword }) as IMentor;
 
+        await newMentor.save();
+    
+        if (!newMentor) {
+            return res.status(500).json({ message: "Error registering Mentor" });
+        }
+    
         // Generate and send PIN
         const pin = Math.floor(1000 + Math.random() * 9000).toString();
         const phoneNumber = phone;
         const smsSent = await sendSMSVerification(pin, phoneNumber);
-
-        if (!smsSent) {
-            return res.status(500).json({ message: "Error sending registration PIN" });
-        }
-
+    
+            if (!smsSent) {
+                return res.status(500).json({ message: "Error sending registration PIN" });
+            }
+    
         // Access token
         const token = jwt.sign(
             {
@@ -399,7 +402,7 @@ router.post("/mentors/register", async (req: Request, res: Response) => {
             },
             process.env.JWT_SECRET || "default_secret",
         );
-
+    
         // Mentor session
         const mentorSession = {
             mentorID: newMentor._id,
@@ -409,7 +412,7 @@ router.post("/mentors/register", async (req: Request, res: Response) => {
             phone
         };
         req.session.mentor = mentorSession;
-
+    
         return res.status(201).json({
             message: "Mentor registered successfully. PIN sent via SMS.",
             nextStep: "/next-login-page",
@@ -419,7 +422,7 @@ router.post("/mentors/register", async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Error registering Mentor" });
     }
 });
-
+    
 
 router.post("/mentors/login", async (req: Request, res: Response) => {
 try {
@@ -429,7 +432,7 @@ try {
     }
 
     try {
-    const mentor = await Mentor.findOne({ email });
+    const mentor: IMentor | null = await Mentor.findOne({ email });
     if (!mentor) {
         return res
         .status(401)
@@ -490,7 +493,7 @@ try {
 router.post("/mentors/respond-to-mentee-request", async (req: Request, res: Response) => {
     try {
         const { requestId, status } = req.body;
-        const mentorRequest = await MentorRequest.findById(requestId);
+        const mentorRequest: IMentorRequest | null = await MentorRequest.findById(requestId);
         if (!mentorRequest) {
             return res.status(404).json({ message: "Mentor request not found" });
         }
