@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IMentor extends Document {
-  mentor_id: mongoose.Types.ObjectId;
+  mentorId: mongoose.Types.ObjectId;
   fname: string;
   lname: string;
   email: string;
@@ -9,7 +9,6 @@ export interface IMentor extends Document {
   password: string; 
   createdAt: Date;
   updatedAt: Date;
-  salt: string;
 }
 
 const mentorSchema: Schema = new mongoose.Schema({
@@ -25,28 +24,37 @@ const mentorSchema: Schema = new mongoose.Schema({
     type: String,
     unique: true,
     required: true,
+    validate: {
+      validator: (email: string) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      },
+      message: "Invalid email format",
+    },
   },
   phone: {
     type: String,
     required: true,
+    validate: {
+      validator: (phone: string) => {
+        return /^\+?\d{1,3}[- ]?\d{3}[- ]?\d{3}[- ]?\d{4}$/.test(phone);
+      },
+      message: "Invalid phone number format",
+    },
   },
   password: {
     type: String,
     required: true,
   },
-  salt: {
-    type: String,
-    required: true,
-  },
   createdAt: { 
-    type: Date, default: Date.now 
+    type: Date, 
+    default: Date.now 
   },
   updatedAt: { 
-    type: Date, default: Date.now
+    type: Date, 
+    default: Date.now
   }  
-  });
+});
 
 const Mentor = mongoose.model<IMentor>("Mentor", mentorSchema);
-
 
 export default Mentor;

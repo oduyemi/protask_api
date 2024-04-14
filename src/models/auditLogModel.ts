@@ -5,7 +5,7 @@ export interface IAuditLog extends Document {
   entity: string;
   entityId: mongoose.Types.ObjectId;
   performedBy: mongoose.Types.ObjectId;
-  performedByRole: 'mentor' | 'mentee'; // Indicates the role of the user who performed the action
+  performedByRole: 'mentor' | 'mentee';
   createdAt: Date;
 }
 

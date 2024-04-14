@@ -11,7 +11,7 @@ const router = express.Router();
 
 
 router.get("/", (req: Request, res: Response) => {
-    res.json({ message: "ProTask!!" });
+    res.json({ message: "Welcome to ProTask!!" });
     });
 
 router.get("/mentees", async (req: Request, res: Response) => {

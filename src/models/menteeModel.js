@@ -17,30 +17,35 @@ const menteeSchema = new mongoose_1.default.Schema({
         type: String,
         unique: true,
         required: true,
+        validate: {
+            validator: (email) => {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            },
+            message: "Invalid email format",
+        },
     },
     phone: {
         type: String,
         required: true,
+        validate: {
+            validator: (phone) => {
+                return /^\+?\d{1,3}[- ]?\d{3}[- ]?\d{3}[- ]?\d{4}$/.test(phone);
+            },
+            message: "Invalid phone number format",
+        },
     },
     password: {
         type: String,
         required: true,
     },
-    salt: {
-        type: String,
-        required: true,
-    },
     createdAt: {
-        type: Date, default: Date.now
+        type: Date,
+        default: Date.now
     },
     updatedAt: {
-        type: Date, default: Date.now
-    },
-    status: {
-        type: String,
-        enum: ["free", "paid"],
-        default: "free"
-    },
+        type: Date,
+        default: Date.now
+    }
 });
 const Mentee = mongoose_1.default.model("Mentee", menteeSchema);
 exports.default = Mentee;

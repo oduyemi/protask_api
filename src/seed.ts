@@ -1,6 +1,6 @@
 import { MongoClient } from "mongodb";
 import { Collection } from "mongodb";
-import TaskCategory from "./src/models/taskCategoryModel.js";
+import TaskCategory from "./models/taskCategoryModel.js";
 require("dotenv").config();
 
 const seedDatabase = async () => {

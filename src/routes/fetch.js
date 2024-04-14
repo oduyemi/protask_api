@@ -19,7 +19,7 @@ const menteeModel_js_1 = __importDefault(require("../models/menteeModel.js"));
 const mentorModel_js_1 = __importDefault(require("../models/mentorModel.js"));
 const router = express_1.default.Router();
 router.get("/", (req, res) => {
-    res.json({ message: "ProTask!!" });
+    res.json({ message: "Welcome to ProTask!!" });
 });
 router.get("/mentees", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
